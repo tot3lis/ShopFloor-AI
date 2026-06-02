@@ -4,6 +4,8 @@
 
 `.shop-ai/state.md`
 
+Do not rename `.shop-ai/`; it remains the state folder for ShopFloor AI.
+
 ## Purpose
 
 The state file gives the wrapper a deterministic, human-readable view of where the shop onboarding pipeline stands.
@@ -73,7 +75,7 @@ Use plain markdown. Keep the tracked fields exact and easy to edit.
 Use short notes for:
 
 - mandatory ShopContext questions asked
-- missing inputs
+- missing chat attachments, pasted inputs, or optional `inputs/` files
 - generation blockers
 - manually supplied user answers
 - validation status

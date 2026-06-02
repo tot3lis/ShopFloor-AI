@@ -2,7 +2,9 @@
 
 This repo is an integrated manufacturing AI skill stack.
 
-Use `step-automation` as the front door for onboarding messy shop inputs and coordinating the Layer 1-4 pipeline.
+Use `$shopfloor-ai` as the front door for onboarding messy shop inputs and coordinating the Layer 1-4 pipeline.
+
+Primary MVP onboarding path: the user drops messy shop files directly into the Codex chat or pastes file contents into the prompt, then says `run shopfloor-ai`. Treat chat-attached and pasted files as valid primary onboarding inputs. An `inputs/` folder is optional, not required.
 
 Repo-local skills:
 
@@ -10,7 +12,7 @@ Repo-local skills:
 - `.agents/skills/sme-generator/`
 - `.agents/skills/sme-manager/`
 - `.agents/skills/sme-knowledge-builder/`
-- `.agents/skills/step-automation/`
+- `.agents/skills/shopfloor-ai/`
 
 When `.shop-ai/state.md` is in `ready_for_questions` state, normal manufacturing shop questions should be answered using SME Manager behavior by default, even if the user does not explicitly invoke `$sme-manager`.
 

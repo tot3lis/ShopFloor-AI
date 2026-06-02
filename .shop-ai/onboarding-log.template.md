@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Copy this file to `.shop-ai/onboarding-log.md` for a local shop onboarding run. Do not commit local onboarding logs.
+Copy this file to `.shop-ai/onboarding-log.md` for a local shop onboarding run with `$shopfloor-ai`. Do not commit local onboarding logs.
+
+Primary onboarding inputs are chat-attached files or pasted prompt content. Files under `inputs/` are optional.
 
 ## Mandatory ShopContext Questions
 
@@ -16,6 +18,8 @@ Record user answers to mandatory questions here.
 
 Record major onboarding events here:
 
+- User attached or pasted messy shop inputs
+- Optional `inputs/` folder used
 - ShopContext started
 - ShopContext finalized `shop-reference.md`
 - SME Generator completed

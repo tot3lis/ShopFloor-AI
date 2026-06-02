@@ -15,6 +15,8 @@ Question mode is active only when `.shop-ai/state.md` contains:
 
 When ready, normal manufacturing shop questions should use SME Manager behavior by default. The user should not need to explicitly type `$sme-manager`.
 
+The user-facing orchestration skill is `$shopfloor-ai`.
+
 Examples:
 
 - What does Op 040 do?
@@ -29,7 +31,7 @@ Examples:
 
 ## Non-Question Onboarding Requests
 
-If the user asks to rerun onboarding, regenerate SMEs, regenerate packages, inspect setup, or validate the stack, use the wrapper workflow first.
+If the user asks to rerun onboarding, regenerate SMEs, regenerate packages, inspect setup, or validate the stack, use the wrapper workflow first and show the short setup status messages defined in `status-messages.md`.
 
 ## SME Manager Boundary
 
@@ -66,6 +68,7 @@ Normal question answers should be:
 
 Avoid:
 
+- setup status messages
 - routing traces
 - package names
 - debug output

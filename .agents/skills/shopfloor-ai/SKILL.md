@@ -1,9 +1,9 @@
 ---
-name: step-automation
-description: Front-door orchestration skill for the manufacturing Layer 1-4 shop AI workflow. Use when onboarding messy shop inputs, maintaining .shop-ai/state.md, running ShopContext, SME Generator, and SME Knowledge Builder in order, or routing normal ready-state shop questions to SME Manager behavior by default.
+name: shopfloor-ai
+description: Front-door orchestration skill for the ShopFloor AI manufacturing Layer 1-4 workflow. Use when onboarding messy shop inputs, maintaining .shop-ai/state.md, running ShopContext, SME Generator, and SME Knowledge Builder in order, or routing normal ready-state shop questions to SME Manager behavior by default.
 ---
 
-# Step Automation
+# ShopFloor AI
 
 ## Purpose
 
@@ -28,8 +28,9 @@ Read `references/pipeline-state-contract.md` before creating or updating the sta
 
 Possible user inputs:
 
-- messy files in `inputs/`
-- user-uploaded files
+- files attached in the current Codex/chat session
+- files pasted into the prompt
+- messy files in `inputs/`, if present
 - pasted router data, machine lists, operation notes, user corrections, work center exports, asset lists, or inspection notes
 - existing generated outputs in the project root
 
@@ -48,55 +49,69 @@ Do not directly rewrite Layer 1-4 behavior from this wrapper.
 ## Workflow
 
 1. Read `references/pipeline-state-contract.md`.
-2. Read or create `.shop-ai/state.md`.
-3. Read `references/onboarding-flow.md`.
-4. Inspect the project for generated outputs:
+2. Read `references/status-messages.md`.
+3. Read or create `.shop-ai/state.md`.
+4. Read `references/onboarding-flow.md`.
+5. Inspect the project for generated outputs:
    - `shop-reference.md`
    - `sme-registry.md`
    - `smes/*.md`
    - `sme-knowledge-map.md`
    - `knowledge-package-registry.md`
-5. If onboarding is incomplete, continue the pipeline in order.
-6. If all required outputs exist, set:
+6. If onboarding is incomplete, continue the pipeline in order and show short setup status messages from `references/status-messages.md`.
+7. If all required outputs exist, set:
    - `onboarding_status: ready_for_questions`
    - `question_mode: enabled`
-7. For normal manufacturing shop questions while ready, follow `references/question-mode-routing.md` and answer using SME Manager behavior by default.
+8. For normal manufacturing shop questions while ready, follow `references/question-mode-routing.md` and answer using SME Manager behavior by default. Do not show pipeline setup status messages for normal questions.
 
 ## Onboarding Behavior
 
 If `shop-reference.md` does not exist:
 
+- Say: "Using ShopContext to generate the shop reference file."
 - Use ShopContext behavior.
-- Collect messy inputs from `inputs/` and/or user-provided files.
-- If ShopContext has mandatory blocking questions, set `onboarding_status: needs_shopcontext_answers`, record the questions in `.shop-ai/onboarding-log.md`, ask only those mandatory questions, and stop.
+- Collect messy inputs from current chat attachments, pasted prompt content, and/or `inputs/` if present.
+- Treat user-provided chat attachments as the primary onboarding path.
+- If no attached/pasted files, no files in `inputs/`, and no existing `shop-reference.md` exist, ask the user to drop in routers, work orders, machine lists, operation exports, or shop notes. Do not proceed to SME Generator.
+- If ShopContext has mandatory blocking questions, say: "ShopContext needs a few confirmations before setup can continue."
+- Set `onboarding_status: needs_shopcontext_answers`, record the questions in `.shop-ai/onboarding-log.md`, ask only those mandatory questions, and stop.
+- When the file is created/finalized, say: "Shop reference file created."
 
 If ShopContext mandatory questions have been answered:
 
-- Use ShopContext behavior to finalize `shop-reference.md`.
+- Use ShopContext behavior to apply the answers.
+- Finalize `shop-reference.md`.
+- Record the answers in `.shop-ai/onboarding-log.md`.
 - Set `shop_reference: finalized`.
 - Set `onboarding_status: ready_for_generation`.
 
 If `shop-reference.md` exists but `sme-registry.md` or `smes/*.md` is missing:
 
+- Say: "Using SME Generator to generate shop SMEs."
 - Use SME Generator behavior automatically.
 - Set `onboarding_status: generating_smes` while running.
 - Set `sme_generation: complete` when outputs exist.
+- Say: "Shop SMEs generated."
 
 If SME outputs exist but `sme-knowledge-map.md` or `knowledge-package-registry.md` is missing:
 
+- Say: "Using SME Knowledge Builder to generate knowledge packages."
 - Use SME Knowledge Builder behavior automatically.
 - Set `onboarding_status: generating_knowledge` while running.
 - Set `knowledge_builder: complete` when outputs exist.
+- Say: "Knowledge packages generated."
 
 If all Layer 1-4 outputs exist:
 
 - Set `onboarding_status: ready_for_questions`.
 - Set `question_mode: enabled`.
-- Tell the user they can now ask normal shop questions in plain English.
+- Say: "ShopFloor AI is ready. You can now ask shop questions in plain English."
 
 ## Question Mode
 
 When `.shop-ai/state.md` says `onboarding_status: ready_for_questions` and `question_mode: enabled`, normal manufacturing shop questions should use SME Manager behavior by default, even if the user does not explicitly type `$sme-manager`.
+
+The user-facing skill name is `$shopfloor-ai`.
 
 Examples:
 
@@ -121,6 +136,8 @@ Default answer style:
 - no corrective action recommendations without evidence and authority
 - no accept/reject decisions without controlling criteria
 
+Do not print setup status messages while answering normal ready-state shop questions.
+
 ## Required Boundaries
 
 - Do not modify ShopContext, SME Generator, SME Manager, or SME Knowledge Builder behavior unless explicitly requested.
@@ -136,3 +153,4 @@ Default answer style:
 - `references/pipeline-state-contract.md`
 - `references/onboarding-flow.md`
 - `references/question-mode-routing.md`
+- `references/status-messages.md`

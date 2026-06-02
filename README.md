@@ -8,7 +8,7 @@ ShopFloor AI helps teams turn scattered manufacturing information into a structu
 
 It can:
 
-- read messy shop inputs such as routers, machine lists, work-center exports, operation notes, and user corrections
+- read messy shop inputs such as chat-attached routers, work orders, machine lists, work-center exports, operation notes, and user corrections
 - create a shop reference from those inputs
 - generate machine, process, inspection, and flow SME shells
 - enrich SMEs with reusable technical knowledge packs
@@ -60,11 +60,14 @@ Future workflows can incorporate user-uploaded manuals, work instructions, specs
 ## Quick Start
 
 1. Clone this repo.
-2. Add messy shop inputs under `inputs/` or provide them in chat.
-3. Run or use `step-automation` once to set up the shop.
-4. Answer any mandatory ShopContext questions.
-5. Wait for SME Generator and SME Knowledge Builder to run automatically.
-6. Once `ready_for_questions` is enabled, ask normal shop questions in plain English.
+2. Open the repo in Codex.
+3. Drop messy shop files directly into the Codex chat.
+4. Type: `run shopfloor-ai`.
+5. Answer any mandatory ShopContext questions.
+6. Wait for SME Generator and SME Knowledge Builder to run automatically.
+7. Once `ready_for_questions` is enabled, ask normal shop questions in plain English.
+
+You may also place files in `inputs/` if you prefer a folder-based workflow, but `inputs/` is optional. The easiest MVP path is to attach or paste the files in Codex and run `$shopfloor-ai`.
 
 ## Example Questions
 
@@ -83,7 +86,7 @@ Future workflows can incorporate user-uploaded manuals, work instructions, specs
     sme-generator/
     sme-manager/
     sme-knowledge-builder/
-    step-automation/
+    shopfloor-ai/
 .shop-ai/
   state.template.md
   onboarding-log.template.md
@@ -92,7 +95,7 @@ examples/
     README.md
     outputs/
 validation/
-  step-automation-orchestrator-validation.md
+  shopfloor-ai-orchestrator-validation.md
 AGENTS.md
 LICENSE
 README.md
@@ -146,13 +149,13 @@ It does not:
 
 The `examples/synthetic-injection-molding-shop/` folder contains fully synthetic generated outputs. They are included only to show what the system can produce.
 
-Do not edit the example to onboard your own shop. Use `inputs/` or chat-provided files for your own messy shop data.
+Do not edit the example to onboard your own shop. Drop messy shop files into Codex, or place them in `inputs/` if you prefer a folder-based workflow.
 
 ## Validation Status
 
 Current validation artifacts include:
 
-- `validation/step-automation-orchestrator-validation.md`
+- `validation/shopfloor-ai-orchestrator-validation.md`
 - `validation/public-package-cleanup-validation.md`
 
 The public package validation confirms that root-level live generated outputs are excluded, `.shop-ai/` contains templates only, all five skills are present, and generated synthetic outputs are retained only under `examples/`.

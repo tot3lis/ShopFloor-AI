@@ -13,4 +13,4 @@ No open mandatory ShopContext questions are recorded for the current generated o
 
 ## Notes
 
-This file is the human-readable onboarding history for the `step-automation` wrapper. Future onboarding runs should record mandatory questions, user answers, generation steps, blockers, and ready-state changes here.
+This file is the human-readable onboarding history for the `$shopfloor-ai` wrapper. Future onboarding runs should record mandatory questions, user answers, generation steps, blockers, and ready-state changes here.

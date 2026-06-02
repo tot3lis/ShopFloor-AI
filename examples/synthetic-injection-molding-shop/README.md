@@ -14,4 +14,4 @@ The `outputs/` folder demonstrates what generated ShopFloor AI outputs can look 
 
 Do not edit this example to onboard your own shop.
 
-To onboard your own shop, place messy inputs in `inputs/` or provide them in chat, then run or use `step-automation`.
+To onboard your own shop, drop messy shop files directly into Codex, then type `run shopfloor-ai`. You may also place files in `inputs/` if you prefer, but the folder is optional.
