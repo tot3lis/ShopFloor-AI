@@ -25,6 +25,7 @@ Examples:
 - Explain this in layman's terms.
 - What records should I ask the team to bring?
 - The parts are shifting in the oven. What should I check?
+- I have resistors 0204 tombstoning in vapor phase, same location on the board across 5 boards, what should I look at?
 - Is this before or after reflow?
 - Which SME should I level up first?
 - What happens if this press goes down?
@@ -65,6 +66,7 @@ Normal question answers should be:
 - shop-aware
 - grounded in generated SME files
 - natural about uncertainty
+- written as direct investigation guidance for normal troubleshooting questions
 
 Avoid:
 
@@ -74,6 +76,7 @@ Avoid:
 - debug output
 - source-depth language
 - broad generic manufacturing answers
+- default meeting-prep wording such as "ask the team to bring" unless the user explicitly asks for meeting prep, what to bring to a meeting, or what records to request from the team
 
 unless the user asks why, asks for explain/debug mode, or asks what the answer was based on.
 

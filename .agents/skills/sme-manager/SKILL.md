@@ -94,7 +94,7 @@ Use 1-3 short paragraphs, or a short answer plus 3-6 bullets when that is cleare
 
 - Direct answer.
 - Shop-specific process, machine, operation, or record context when known.
-- What to check or ask the team to bring.
+- What to check, what to look at, or useful records/evidence to review.
 - What is not proven.
 - Best next document or evidence upload only when useful.
 
@@ -110,6 +110,7 @@ Avoid:
 - Corrective action recommendations without evidence or authority.
 - Accept/reject decisions without controlling criteria.
 - RCCA behavior by default.
+- Meeting-prep phrasing such as "ask the team to bring", "bring to the meeting", "records I'd ask the team to bring", or "have the team bring" unless the user explicitly asks for meeting prep, asks what to bring to a meeting, or asks what records to request from the team.
 - Final conclusions from Level 3 SME shells alone.
 
 ## Reference Files
