@@ -20,54 +20,101 @@ Most shop knowledge is not stored in one clean system. It lives across routers, 
 
 ShopFloor AI provides a layered way to organize that knowledge without pretending generic AI knows your shop. The system first builds shop-specific context, then generates SMEs, then enriches those SMEs with bounded technical knowledge.
 
-## Layered Architecture
+In practice, ShopFloor AI first builds the shop brain, then turns on the shop assistant. The setup execution order is: `shop-reference.md` -> SME shells -> SME knowledge packs -> SME Manager question mode.
 
-### Layer 1: ShopContext
+## How It Works
 
-Creates `shop-reference.md` from messy manufacturing shop data. It maps products, operations, work centers, machines, inspection gates, conditional steps, and uncertainty.
+ShopFloor AI runs setup automatically after the user uploads files and types `run shopfloor-ai`. Users do not manually run each piece.
 
-### Layer 2: SME Generator
+### Build The Shop Reference
 
-Reads `shop-reference.md` and generates:
+ShopFloor AI builds `shop-reference.md`. This turns messy shop data into a structured map of products, operations, work centers, machines, inspection gates, shop language, and known uncertainty.
 
-- `sme-coverage.md`
+`shop-reference.md` must be finalized before SMEs are generated. If ShopContext finds blocking uncertainty, setup pauses and asks only the needed questions. It will not generate SMEs or knowledge packs until the shop reference is finalized.
+
+### Generate Shop SMEs
+
+ShopFloor AI reads the finalized reference and generates shop-aware machine, process, inspection, and flow experts:
+
 - `sme-registry.md`
+- `sme-coverage.md`
 - `smes/*.md`
 
-These SME shells define which machine, process, inspection, or flow experts the shop assistant can route questions to.
+These SME shells define which experts the assistant can route questions to.
 
-### Layer 3: SME Manager
+### Build SME Knowledge Packs
 
-Routes shop questions to the relevant SMEs, gathers SME contributions, and synthesizes concise user-facing answers.
-
-The manager remains an orchestrator. It does not become the technical knowledge base directly.
-
-### Layer 4: SME Knowledge Builder / Knowledge Packs
-
-Builds reusable knowledge packages and maps them to SMEs:
+ShopFloor AI builds knowledge packs for the generated SMEs:
 
 - `knowledge-package-registry.md`
 - `sme-knowledge-map.md`
-- `knowledge-packages/*/knowledge-pack.md`
-- `knowledge-packages/*/source-map.md`
+- `knowledge-packages/*`
 
-Knowledge packs upgrade SMEs. They do not override shop-specific facts.
+Knowledge packs give the generated SMEs broader technical context while staying bounded by shop-specific facts. They do not override shop facts, uploaded documents, actual evidence, or controlling acceptance criteria.
 
-### Layer 5: Future Uploaded Evidence
+### Turn On Question Mode
 
-Future workflows can incorporate user-uploaded manuals, work instructions, specs, inspection plans, calibration records, travelers, logs, and actual production evidence.
+After the reference, SMEs, and knowledge packs exist, ShopFloor AI turns on question mode. SME Manager becomes the front door for user questions.
+
+SME Manager:
+
+- routes each question to the right generated SMEs
+- lets selected SMEs use their shop facts and linked knowledge packs
+- combines the SME responses into one practical answer for the user
+
+The setup order is: `shop-reference.md` -> SME shells -> SME knowledge packs -> SME Manager question mode.
+
+Question mode is not enabled until the reference, SMEs, and knowledge packs exist.
 
 ## Quick Start
 
 1. Clone this repo.
 2. Open the repo in Codex.
-3. Drop messy shop files directly into the Codex chat.
-4. Type: `run shopfloor-ai`.
-5. Answer any mandatory ShopContext questions.
-6. Wait for SME Generator and SME Knowledge Builder to run automatically.
-7. Once `ready_for_questions` is enabled, ask normal shop questions in plain English.
+3. Drop/upload shop files into the chat.
+4. Type:
+   `run shopfloor-ai`
+5. Answer any setup questions.
+6. When it says ready, ask shop questions in plain English.
 
 You may also place files in `inputs/` if you prefer a folder-based workflow, but `inputs/` is optional. The easiest MVP path is to attach or paste the files in Codex and run `$shopfloor-ai`.
+
+## What To Upload
+
+The best starting point is usually:
+
+- a router export or operation export with operation numbers, operation names, work centers, and product or part family context
+- a machine/equipment list with machine names, aliases if available, work centers if available, and what each machine is used for
+
+Other shop files can also help, especially when they add context to the operation flow or machine mappings. Supporting files may include work orders, travelers, inspection/test station lists, asset exports, selected work instruction excerpts, and short notes that clarify ambiguous operation, work center, or machine mappings.
+
+Notes alone may not be enough to build a reliable shop reference if they do not explain the operation flow or machine/equipment context.
+
+Good starting package example:
+
+- router or operation export
+- machine/equipment list
+- optional short notes explaining unclear operation, work center, or machine mappings
+
+Best file types:
+
+- `.csv`
+- `.xlsx`
+- `.md`
+- `.txt`
+- text-readable `.pdf`
+
+Not ideal:
+
+- screenshots
+- scanned PDFs
+- image-only files
+
+Example notes:
+
+- Op 030 Place Components can run on MY200 SX or MY300 DX depending on program availability.
+- Work center 635C01 is Koh Young AOI for CCA-PWR.
+- Final verify is manual microscope review.
+- GenRad Test Rack 2 retains test records for CCA-CTRL only.
 
 ## Example Questions
 
@@ -77,88 +124,18 @@ You may also place files in `inputs/` if you prefer a folder-based workflow, but
 - The parts are shifting in the oven. What should I check?
 - Which SME should I level up first?
 
-## Repository Structure
+## Files And Outputs
 
-```text
-.agents/
-  skills/
-    shop-context/
-    sme-generator/
-    sme-manager/
-    sme-knowledge-builder/
-    shopfloor-ai/
-.shop-ai/
-  state.template.md
-  onboarding-log.template.md
-examples/
-  synthetic-injection-molding-shop/
-    README.md
-    outputs/
-validation/
-  shopfloor-ai-orchestrator-validation.md
-AGENTS.md
-LICENSE
-README.md
-```
-
-Generated local shop outputs are intentionally ignored at the package root:
-
-- `shop-reference.md`
-- `sme-registry.md`
-- `sme-coverage.md`
-- `smes/`
-- `sme-knowledge-map.md`
-- `knowledge-package-registry.md`
-- `knowledge-packages/`
-- `.shop-ai/state.md`
-- `.shop-ai/onboarding-log.md`
-
-## Source Priority And Safety Boundaries
-
-ShopFloor AI is designed to respect source authority.
-
-Source priority should generally move from strongest to weakest:
-
-1. user-uploaded manuals, procedures, specs, criteria, and records
-2. generated shop-specific SME shells and shop context
-3. linked knowledge packages
-4. public or generic manufacturing knowledge
-
-Public or generic knowledge packages must not override shop-specific facts, user-uploaded documents, actual evidence, or controlling acceptance criteria.
+- `.agents/skills/` contains the Codex skills.
+- `examples/` contains synthetic examples.
+- Generated shop outputs are local and ignored by git.
 
 ## Limitations
 
-ShopFloor AI does not replace:
-
-- quality authority
-- engineering authority
-- approved work instructions
-- customer specifications
-- acceptance criteria
-- qualified manufacturing judgment
-
-It does not:
-
-- make accept/reject decisions without controlling criteria
-- claim root cause without evidence
-- recommend corrective action without evidence and authority
-- treat public knowledge as shop-approved truth
-- quantify production impact without schedule, capacity, or run records
-
-## Synthetic Example
-
-The `examples/synthetic-injection-molding-shop/` folder contains fully synthetic generated outputs. They are included only to show what the system can produce.
-
-Do not edit the example to onboard your own shop. Drop messy shop files into Codex, or place them in `inputs/` if you prefer a folder-based workflow.
-
-## Validation Status
-
-Current validation artifacts include:
-
-- `validation/shopfloor-ai-orchestrator-validation.md`
-- `validation/public-package-cleanup-validation.md`
-
-The public package validation confirms that root-level live generated outputs are excluded, `.shop-ai/` contains templates only, all five skills are present, and generated synthetic outputs are retained only under `examples/`.
+- ShopFloor AI does not replace quality authority, engineering authority, approved work instructions, customer requirements, or acceptance criteria.
+- It should not claim root cause, corrective action, accept/reject decisions, or exact production impact without evidence.
+- Public/generic knowledge packs are background context, not shop-approved truth.
+- Output quality depends on the quality of the router/operation export and machine/equipment list.
 
 ## License
 
