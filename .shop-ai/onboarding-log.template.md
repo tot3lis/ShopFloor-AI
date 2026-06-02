@@ -10,6 +10,8 @@ Primary onboarding inputs are chat-attached files or pasted prompt content. File
 
 Record any mandatory blocking questions here.
 
+Use this section for unresolved ShopContext review-gate questions when state says `shop_reference_status: review_needed`.
+
 ## User Answers
 
 Record user answers to mandatory questions here.
@@ -21,6 +23,7 @@ Record major onboarding events here:
 - User attached or pasted messy shop inputs
 - Optional `inputs/` folder used
 - ShopContext started
+- ShopContext review gate triggered; awaiting user confirmations
 - ShopContext finalized `shop-reference.md`
 - SME Generator completed
 - SME Knowledge Builder completed

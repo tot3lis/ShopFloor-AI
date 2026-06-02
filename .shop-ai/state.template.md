@@ -1,7 +1,8 @@
 # Shop AI State
 
-- onboarding_status: needs_inputs
+- onboarding_status: no_shop_inputs
 - shop_reference: missing
+- shop_reference_status: missing
 - sme_generation: not_started
 - knowledge_builder: not_started
 - question_mode: disabled
