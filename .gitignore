@@ -1,0 +1,46 @@
+# OS/editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Python/cache files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Temporary logs and scratch
+*.tmp
+*.temp
+*.log
+tmp/
+scratch/
+.cache/
+
+# Cloned/source dependency repos
+source-repos/
+
+# Local generated shop outputs
+shop-reference.md
+sme-registry.md
+sme-coverage.md
+smes/
+sme-knowledge-map.md
+knowledge-package-registry.md
+knowledge-packages/
+
+# Local ShopFloor AI runtime state
+.shop-ai/state.md
+.shop-ai/onboarding-log.md
+
+# Keep public package assets
+!.agents/skills/**
+!README.md
+!LICENSE
+!AGENTS.md
+!validation/**
+!examples/**
+!.shop-ai/*.template.md

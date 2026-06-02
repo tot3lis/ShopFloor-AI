@@ -1,0 +1,4 @@
+interface:
+  display_name: "SME Knowledge Builder"
+  short_description: "Build reusable manufacturing SME knowledge packages."
+  default_prompt: "Build knowledge packages from generated SME shells and map them to SMEs."

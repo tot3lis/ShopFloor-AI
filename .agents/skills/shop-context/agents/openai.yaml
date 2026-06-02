@@ -1,0 +1,4 @@
+interface:
+  display_name: "ShopContext"
+  short_description: "Build manufacturing shop context"
+  default_prompt: "Use $shop-context to review shop files and draft a shop-reference.md."
