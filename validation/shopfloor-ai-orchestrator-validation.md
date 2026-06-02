@@ -33,6 +33,12 @@ Validate the top-level `$shopfloor-ai` wrapper skill for the integrated manufact
 | Onboarding flow stops for mandatory ShopContext questions | pass | State changes to `needs_shopcontext_answers`, prints the blocking status message, and asks only mandatory questions |
 | Onboarding flow auto-runs SME Generator after finalized `shop-reference.md` | pass | `onboarding-flow.md` defines automatic SME generation when registry/shells are missing |
 | Onboarding flow auto-runs SME Knowledge Builder after SME generation | pass | `onboarding-flow.md` defines automatic knowledge generation when registry/map are missing |
+| Planning can read later-layer instructions before execution | pass | `SKILL.md`, `onboarding-flow.md`, and `pipeline-state-contract.md` allow later-layer skill/reference reads for planning and validation |
+| Later-layer execution is gated by upstream artifacts | pass | SME Generator requires finalized `shop-reference.md`; SME Knowledge Builder requires `sme-registry.md`, `sme-coverage.md`, and at least one `smes/*.md` file |
+| Public-source Layer 4 gathering is treated as Layer 4 execution | pass | Contract states public-source research/gathering must not begin before SME outputs exist |
+| State is not pre-written to final ready state | pass | Contract requires incremental state updates and forbids `ready_for_questions` until artifact checks pass |
+| `ready_for_questions` requires full artifact checks | pass | Required checks include Layer 1 file, SME registry/coverage/shells, knowledge registry/map, and at least one `knowledge-packages/*/knowledge-pack.md` |
+| Onboarding log cannot claim future stages early | pass | Contract says the log updates incrementally or final-writes only after Layer 4 completes |
 | Setup flow shows short status lines | pass | `status-messages.md` defines one-sentence status messages for ShopContext, SME Generator, SME Knowledge Builder, and ready state |
 | Normal question mode does not show setup status lines | pass | `question-mode-routing.md` and `status-messages.md` prohibit setup status messages for normal ready-state shop questions |
 | `ready_for_questions` state enables default SME Manager behavior | pass | `question-mode-routing.md` and `AGENTS.md` define this behavior |
@@ -79,8 +85,26 @@ Local generated state files remain ignored:
 - Source priority was not changed.
 - Root cause, corrective action, capacity estimates, and accept/reject decisions remain evidence-bound.
 
+## Gold-Test Routing / State Finding
+
+A cold-test run showed that generated artifacts were produced in the correct order:
+
+1. `shop-reference.md`
+2. SME outputs
+3. knowledge package outputs
+
+However, `.shop-ai/state.md` and `.shop-ai/onboarding-log.md` were written at the same time as `shop-reference.md` and already claimed later stages and `ready_for_questions` were complete. That created a bad intermediate window where question mode could appear enabled before SME and knowledge artifacts existed.
+
+New pass criteria:
+
+- State must not be pre-written to final ready state.
+- `ready_for_questions` requires explicit artifact existence checks.
+- SME Knowledge Builder and public-source Layer 4 gathering must not begin before SME outputs exist.
+- Reading later-layer instructions for planning is allowed and is not treated as layer execution.
+- Onboarding log entries must not claim future stages are complete before the stage artifacts exist.
+
 ## Result
 
 Pass.
 
-The `$shopfloor-ai` skill now provides the intended MVP front door: onboarding messy inputs, showing short setup status lines, stopping for mandatory ShopContext questions, auto-running SME and knowledge generation when outputs are missing, and enabling normal shop questions through SME Manager behavior once ready.
+The `$shopfloor-ai` skill now provides the intended MVP front door: onboarding messy inputs, showing short setup status lines, stopping for mandatory ShopContext questions, auto-running SME and knowledge generation when outputs are missing, updating state incrementally, and enabling normal shop questions through SME Manager behavior only after ready-state artifact checks pass.

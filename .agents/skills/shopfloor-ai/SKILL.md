@@ -55,14 +55,29 @@ Do not directly rewrite Layer 1-4 behavior from this wrapper.
 5. Inspect the project for generated outputs:
    - `shop-reference.md`
    - `sme-registry.md`
+   - `sme-coverage.md`
    - `smes/*.md`
    - `sme-knowledge-map.md`
    - `knowledge-package-registry.md`
+   - `knowledge-packages/*/knowledge-pack.md`
 6. If onboarding is incomplete, continue the pipeline in order and show short setup status messages from `references/status-messages.md`.
 7. If all required outputs exist, set:
    - `onboarding_status: ready_for_questions`
    - `question_mode: enabled`
 8. For normal manufacturing shop questions while ready, follow `references/question-mode-routing.md` and answer using SME Manager behavior by default. Do not show pipeline setup status messages for normal questions.
+
+## Planning Vs Execution Boundary
+
+The wrapper may read later-layer skill files and reference files while planning the workflow, checking contracts, or understanding the required sequence.
+
+Reading instructions is not execution.
+
+Do not execute a layer until its required input artifacts exist:
+
+- Do not run SME Generator until `shop-reference.md` exists, is finalized, and mandatory ShopContext questions are resolved.
+- Do not run SME Knowledge Builder until `sme-registry.md`, `sme-coverage.md`, and at least one `smes/*.md` shell exist.
+- Public-source Layer 4 research, source gathering, package derivation, package writing, and knowledge-package mapping all count as SME Knowledge Builder execution.
+- Do not use SME Manager question mode until `ready_for_questions` is valid according to `references/pipeline-state-contract.md`.
 
 ## Onboarding Behavior
 
@@ -84,28 +99,46 @@ If ShopContext mandatory questions have been answered:
 - Record the answers in `.shop-ai/onboarding-log.md`.
 - Set `shop_reference: finalized`.
 - Set `onboarding_status: ready_for_generation`.
+- Do not set `onboarding_status: ready_for_questions`.
+- Do not set `question_mode: enabled`.
 
-If `shop-reference.md` exists but `sme-registry.md` or `smes/*.md` is missing:
+If `shop-reference.md` exists and is finalized but `sme-registry.md`, `sme-coverage.md`, or `smes/*.md` is missing:
 
 - Say: "Using SME Generator to generate shop SMEs."
 - Use SME Generator behavior automatically.
 - Set `onboarding_status: generating_smes` while running.
-- Set `sme_generation: complete` when outputs exist.
+- Set `sme_generation: complete` only after `sme-registry.md`, `sme-coverage.md`, and at least one `smes/*.md` shell exist.
 - Say: "Shop SMEs generated."
+- Do not set `onboarding_status: ready_for_questions`.
+- Do not set `question_mode: enabled`.
 
-If SME outputs exist but `sme-knowledge-map.md` or `knowledge-package-registry.md` is missing:
+If SME outputs exist but `sme-knowledge-map.md`, `knowledge-package-registry.md`, or `knowledge-packages/*/knowledge-pack.md` is missing:
 
 - Say: "Using SME Knowledge Builder to generate knowledge packages."
 - Use SME Knowledge Builder behavior automatically.
 - Set `onboarding_status: generating_knowledge` while running.
-- Set `knowledge_builder: complete` when outputs exist.
+- Set `knowledge_builder: complete` only after `knowledge-package-registry.md`, `sme-knowledge-map.md`, and at least one `knowledge-packages/*/knowledge-pack.md` file exist.
 - Say: "Knowledge packages generated."
 
 If all Layer 1-4 outputs exist:
 
+- Confirm these artifacts exist before changing state:
+  - `shop-reference.md`
+  - `sme-registry.md`
+  - `sme-coverage.md`
+  - at least one `smes/*.md` file
+  - `knowledge-package-registry.md`
+  - `sme-knowledge-map.md`
+  - at least one `knowledge-packages/*/knowledge-pack.md` file
 - Set `onboarding_status: ready_for_questions`.
 - Set `question_mode: enabled`.
 - Say: "ShopFloor AI is ready. You can now ask shop questions in plain English."
+
+## Onboarding Log Rules
+
+Update `.shop-ai/onboarding-log.md` incrementally after each completed stage, or write the final log only at the actual end of Layer 4.
+
+The log must not claim future stages are complete before their output artifacts exist. If the log records timestamps, the final ready entry must correspond to the end of SME Knowledge Builder output creation, not the end of ShopContext.
 
 ## Question Mode
 
