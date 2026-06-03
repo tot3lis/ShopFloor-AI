@@ -1,13 +1,17 @@
 ---
 name: shopfloor-ai
-description: Front-door orchestration skill for the ShopFloor AI manufacturing Layer 1-4 workflow. Use when onboarding messy shop inputs, maintaining .shop-ai/state.md, running ShopContext, SME Generator, and SME Knowledge Builder in order, or routing normal ready-state shop questions to SME Manager behavior by default.
+description: Public/user-facing ShopFloor AI orchestrator and top-level entrypoint for the manufacturing Layer 1-4 workflow. Must trigger when the user says `run shopfloor-ai`, `$shopfloor-ai`, `use shopfloor-ai`, or asks to onboard or run ShopFloor AI. Use attached router exports, machine lists, work orders, travelers, operation files, pasted shop data, or `inputs/` files as inputs to this orchestrator, not as a reason to bypass it. Owns the full onboarding flow from `shop-reference.md` to SME shells to SME knowledge packs to SME Manager question mode. During onboarding, runs ShopContext as the first internal step, then SME Generator and SME Knowledge Builder, and routes ready-state shop questions to SME Manager behavior by default.
 ---
 
 # ShopFloor AI
 
 ## Purpose
 
-Act as the top-level wrapper for the integrated manufacturing shop AI workflow.
+Act as the public/user-facing top-level orchestrator for the integrated manufacturing shop AI workflow.
+
+This is the front door for the public MVP. It must be selected when the user explicitly says `run shopfloor-ai`, `$shopfloor-ai`, `use shopfloor-ai`, or asks to onboard or run ShopFloor AI.
+
+Explicit product command beats implicit file match. Attached router exports, machine lists, work orders, travelers, operation files, and similar ShopContext-looking inputs are inputs to the ShopFloor AI orchestrator, not a reason to bypass it.
 
 This skill does not replace, merge, or rewrite the Layer 1-4 skills. It coordinates them in order:
 
@@ -15,6 +19,12 @@ This skill does not replace, merge, or rewrite the Layer 1-4 skills. It coordina
 2. SME Generator creates `sme-coverage.md`, `sme-registry.md`, and `smes/*.md`.
 3. SME Knowledge Builder creates `knowledge-package-registry.md`, `sme-knowledge-map.md`, and `knowledge-packages/*`.
 4. SME Manager answers normal shop questions after the project is ready.
+
+During ShopFloor AI onboarding, call ShopContext as the first internal step.
+
+## Anti-Bypass Rule
+
+When the user explicitly invokes ShopFloor AI with `run shopfloor-ai`, `$shopfloor-ai`, `use shopfloor-ai`, or equivalent onboarding/run language, do not directly switch to ShopContext just because the input files look like ShopContext inputs. Use ShopFloor AI first, then let this orchestrator run ShopContext internally.
 
 ## Required State File
 

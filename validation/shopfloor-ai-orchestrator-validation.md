@@ -21,6 +21,7 @@ Validate the top-level `$shopfloor-ai` wrapper skill for the integrated manufact
 | Check | Result | Notes |
 |---|---:|---|
 | User-facing skill is now `shopfloor-ai` | pass | Skill metadata says `name: shopfloor-ai`; folder is `.agents/skills/shopfloor-ai/` |
+| Explicit `shopfloor-ai` invocation beats ShopContext file matching | pass | `shopfloor-ai` metadata and AGENTS.md say `run shopfloor-ai`, `$shopfloor-ai`, and `use shopfloor-ai` route to the top-level orchestrator even when attached files look like ShopContext inputs |
 | Old `step-automation` skill folder removed | pass | `.agents/skills/step-automation/` no longer exists |
 | State contract exists | pass | `references/pipeline-state-contract.md` created under `shopfloor-ai` |
 | Status message reference exists | pass | `references/status-messages.md` defines setup status behavior |
@@ -152,6 +153,22 @@ run shopfloor-ai
 ```
 
 Attach or paste an ambiguous router, machine list, and shop notes where at least one normal operation has conflicting machine/work-center ownership or a generic operation name that affects downstream mapping. The expected first-run result is the blocking status message and no downstream artifacts.
+
+## Required Regression Case: Explicit shopfloor-ai invocation wins over ShopContext file matching
+
+### Input
+
+```text
+attached router-export.md
+attached machine-list.md
+prompt: run shopfloor-ai
+```
+
+### Expected
+
+- Codex invokes `shopfloor-ai` as the top-level orchestrator.
+- `shopfloor-ai` uses ShopContext internally.
+- Codex does not say it is choosing `shop-context` instead of `shopfloor-ai`.
 
 ## Result
 

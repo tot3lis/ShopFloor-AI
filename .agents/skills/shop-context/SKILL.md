@@ -1,6 +1,6 @@
 ---
 name: shop-context
-description: Use when creating or updating a shop-specific manufacturing reference file from routers, work orders, operation lists, work centers, machine lists, asset exports, operation instructions, and user notes.
+description: Use when the user explicitly asks for ShopContext or only wants to create, review, update, or finalize `shop-reference.md` from routers, work orders, operation lists, work centers, machine lists, asset exports, operation instructions, and user notes. Do not take over as the top-level skill when the user says `run shopfloor-ai`, `$shopfloor-ai`, `use shopfloor-ai`, or otherwise invokes ShopFloor AI; let the ShopFloor AI orchestrator run ShopContext internally.
 ---
 
 # ShopContext
@@ -13,12 +13,16 @@ Manufacturing shops often have dirty data, legacy systems, inconsistent terminol
 
 Use ShopContext when the user wants to:
 
+- Explicitly run ShopContext
 - Create a shop-specific manufacturing reference file
+- Create, review, update, or finalize only `shop-reference.md`
 - Interpret routers, work orders, travelers, operation lists, work centers, machine lists, asset exports, or operation instructions
 - Build or update `shop-reference.md`
 - Map operations to machines, equipment, work centers, and internal process steps
 - Identify quality gates, inspections, tests, reviews, and acceptance points in a shop flow
 - Prepare shop context for later manufacturing questions
+
+Boundary: if the user says `run shopfloor-ai`, `$shopfloor-ai`, `use shopfloor-ai`, or asks to onboard or run ShopFloor AI, do not take over as the top-level skill. Let `shopfloor-ai` orchestrate and call ShopContext internally.
 
 Do not use ShopContext when the user asks to solve a defect, determine root cause, write a corrective action, analyze historical defect trends, perform SPC analysis, or integrate live manufacturing systems.
 

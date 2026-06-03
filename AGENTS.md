@@ -4,6 +4,8 @@ This repo is an integrated manufacturing AI skill stack.
 
 Use `$shopfloor-ai` as the front door for onboarding messy shop inputs and coordinating the Layer 1-4 pipeline.
 
+Public MVP routing rule: `shopfloor-ai` is the top-level entrypoint. Explicit `run shopfloor-ai`, `$shopfloor-ai`, or `use shopfloor-ai` routes to `.agents/skills/shopfloor-ai/`. Explicit product command beats implicit file match, so router exports, machine lists, work orders, travelers, and operation files attached to that command remain inputs to ShopFloor AI. Lower-level skills are internal unless explicitly requested by the user or invoked by the orchestrator.
+
 Primary MVP onboarding path: the user drops messy shop files directly into the Codex chat or pastes file contents into the prompt, then says `run shopfloor-ai`. Treat chat-attached and pasted files as valid primary onboarding inputs. An `inputs/` folder is optional, not required.
 
 Repo-local skills:

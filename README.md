@@ -72,9 +72,15 @@ Question mode is not enabled until the reference, SMEs, and knowledge packs exis
 2. Open the repo in Codex.
 3. Drop/upload shop files into the chat.
 4. Type:
-   `run shopfloor-ai`
+
+   ```text
+   run shopfloor-ai
+   ```
+
 5. Answer any setup questions.
 6. When it says ready, ask shop questions in plain English.
+
+Do not run the lower-level skills directly for normal onboarding. ShopFloor AI will run them in order.
 
 You may also place files in `inputs/` if you prefer a folder-based workflow, but `inputs/` is optional. The easiest MVP path is to attach or paste the files in Codex and run `$shopfloor-ai`.
 
