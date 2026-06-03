@@ -44,6 +44,8 @@ Possible user inputs:
 - pasted router data, machine lists, operation notes, user corrections, work center exports, asset lists, or inspection notes
 - existing generated outputs in the project root
 
+Public package documentation and examples are not shop inputs unless the user explicitly supplies them as shop evidence. Do not use `README.md`, `AGENTS.md`, `validation/`, `.agents/skills/`, `examples/`, or example generated outputs to resolve ambiguity in the user's attached, pasted, or `inputs/` shop files.
+
 ## Outputs
 
 The wrapper may create or update:
@@ -74,11 +76,13 @@ Do not directly rewrite Layer 1-4 behavior from this wrapper.
    - `.shop-ai/state.md` must record `shop_reference_status: finalized`.
    - `.shop-ai/onboarding-log.md` must not record unresolved ShopContext blocking questions.
    - The latest ShopContext result must not be `ShopContext Review - User Confirmation Needed` or `ShopContext Review - Still Blocked`.
+   - Run the finalization audit in `references/onboarding-flow.md` against the latest ShopContext output and `shop-reference.md`.
    - `shop-reference.md` existence by itself never proves finalization.
 7. If onboarding is incomplete, continue the pipeline in order and show short setup status messages from `references/status-messages.md`.
 8. If all required outputs exist and `shop_reference_status: finalized`, set:
    - `onboarding_status: ready_for_questions`
    - `question_mode: enabled`
+   only after the finalization audit passes.
 9. For normal manufacturing shop questions while ready, follow `references/question-mode-routing.md` and answer using SME Manager behavior by default. Do not show pipeline setup status messages for normal questions.
 
 ## Planning Vs Execution Boundary
@@ -89,7 +93,7 @@ Reading instructions is not execution.
 
 Do not execute a layer until its required input artifacts and state gates exist:
 
-- Do not run SME Generator until `shop-reference.md` exists, `.shop-ai/state.md` says `shop_reference_status: finalized`, and mandatory ShopContext questions are resolved.
+- Do not run SME Generator until `shop-reference.md` exists, `.shop-ai/state.md` says `shop_reference_status: finalized`, mandatory ShopContext questions are resolved, and the finalization audit finds no unresolved blocking uncertainty.
 - Do not treat `shop-reference.md` existence as finalization. Draft-only references, partial references, review outputs, or any ShopContext result with blocking questions are not valid Layer 2 inputs.
 - Do not run SME Knowledge Builder until `sme-registry.md`, `sme-coverage.md`, and at least one `smes/*.md` shell exist.
 - Public-source Layer 4 research, source gathering, package derivation, package writing, and knowledge-package mapping all count as SME Knowledge Builder execution.
@@ -106,6 +110,8 @@ If `shop-reference.md` does not exist:
 - If no attached/pasted files, no files in `inputs/`, and no existing `shop-reference.md` exist, ask the user to drop in routers, work orders, machine lists, operation exports, or shop notes. Do not proceed to SME Generator.
 - If ShopContext outputs `ShopContext Review - User Confirmation Needed`, `ShopContext Review - Still Blocked`, a `Blocking Open Questions` section, or any mandatory blocking questions, say: "ShopContext needs a few confirmations before setup can continue."
 - Set `onboarding_status: awaiting_shopcontext_confirmations`, `shop_reference_status: review_needed`, and `question_mode: disabled`; record the exact blocking questions in `.shop-ai/onboarding-log.md`, ask only those mandatory questions, and stop.
+- After ShopContext creates or updates `shop-reference.md`, run the finalization audit before recording `shop_reference_status: finalized` or starting SME Generator.
+- If the audit finds unresolved blocking uncertainty in normal operation flow, operation-to-machine/equipment mapping, work center ownership, inspection/test mapping, or confirmed record/log claims, say: "ShopContext needs a few confirmations before setup can continue."; set `onboarding_status: awaiting_shopcontext_confirmations`, `shop_reference_status: review_needed`, and `question_mode: disabled`; record the audit questions in `.shop-ai/onboarding-log.md`; ask only those questions; and stop.
 - Do not run SME Generator, SME Knowledge Builder, public-source gathering, or question mode while `shop_reference_status` is `missing`, `draft`, or `review_needed`.
 - When the file is created/finalized, say: "Shop reference file created."
 
@@ -120,7 +126,7 @@ If ShopContext mandatory questions have been answered:
 - Do not set `onboarding_status: ready_for_questions`.
 - Do not set `question_mode: enabled`.
 
-If `shop-reference.md` exists, `.shop-ai/state.md` records `shop_reference_status: finalized`, no ShopContext blocking questions remain, and `sme-registry.md`, `sme-coverage.md`, or `smes/*.md` is missing:
+If `shop-reference.md` exists, `.shop-ai/state.md` records `shop_reference_status: finalized`, no ShopContext blocking questions remain, the finalization audit passes, and `sme-registry.md`, `sme-coverage.md`, or `smes/*.md` is missing:
 
 - Say: "Using SME Generator to generate shop SMEs."
 - Use SME Generator behavior automatically.
@@ -152,6 +158,7 @@ If all Layer 1-4 outputs exist:
   - at least one `knowledge-packages/*/knowledge-pack.md` file
 - Confirm `.shop-ai/state.md` records `shop_reference_status: finalized`.
 - Confirm `.shop-ai/onboarding-log.md` does not contain unresolved ShopContext blocking questions.
+- Confirm the finalization audit passes.
 - Set `onboarding_status: ready_for_questions`.
 - Set `question_mode: enabled`.
 - Say: "ShopFloor AI is ready. You can now ask shop questions in plain English."

@@ -115,7 +115,9 @@ Not ideal:
 - scanned PDFs
 - image-only files
 
-Example notes:
+Illustrative example notes:
+
+These examples are documentation only. ShopFloor AI must not treat them as shop facts or use them to resolve ambiguity in attached, pasted, or `inputs/` files.
 
 - Op 030 Place Components can run on MY200 SX or MY300 DX depending on program availability.
 - Work center 635C01 is Koh Young AOI for CCA-PWR.

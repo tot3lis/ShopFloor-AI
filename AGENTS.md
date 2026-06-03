@@ -8,6 +8,8 @@ Public MVP routing rule: `shopfloor-ai` is the top-level entrypoint. Explicit `r
 
 Primary MVP onboarding path: the user drops messy shop files directly into the Codex chat or pastes file contents into the prompt, then says `run shopfloor-ai`. Treat chat-attached and pasted files as valid primary onboarding inputs. An `inputs/` folder is optional, not required.
 
+Public package documentation and examples are not shop evidence. Do not use `README.md`, `AGENTS.md`, `validation/`, `.agents/skills/`, `examples/`, or synthetic example outputs to resolve ambiguity in attached, pasted, `inputs/`, or user-designated shop files unless the user explicitly supplies those package files as shop evidence.
+
 Repo-local skills:
 
 - `.agents/skills/shop-context/`

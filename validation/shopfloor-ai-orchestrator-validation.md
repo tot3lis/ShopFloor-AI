@@ -28,10 +28,13 @@ Validate the top-level `$shopfloor-ai` wrapper skill for the integrated manufact
 | Root `AGENTS.md` exists | pass | Repo-level ready-state and SME Manager instructions point to `$shopfloor-ai` |
 | Chat-attached files are documented as primary onboarding path | pass | README, AGENTS, SKILL.md, and onboarding flow say users can drop messy files into Codex and run `$shopfloor-ai` |
 | `inputs/` is optional | pass | Docs say `inputs/` may be used if preferred but is not required |
+| Public package docs and examples are excluded from ShopContext evidence | pass | AGENTS.md, SKILL.md, onboarding flow, and README state that package docs/examples must not resolve ambiguity unless explicitly supplied as shop evidence |
 | `$shopfloor-ai` can start from user-provided files without a prebuilt `inputs/` folder | pass | Onboarding flow checks chat attachments and pasted prompt content before optional `inputs/` |
 | Onboarding flow handles missing `shop-reference.md` | pass | `onboarding-flow.md` routes missing reference to ShopContext behavior |
 | Onboarding flow blocks when no files are available | pass | If no chat attachments, pasted data, optional `inputs/` files, or existing `shop-reference.md` exist, it asks for routers, work orders, machine lists, operation exports, or shop notes |
 | Onboarding flow stops for mandatory ShopContext questions | pass | State changes to `awaiting_shopcontext_confirmations`, `shop_reference_status: review_needed`, prints the blocking status message, and asks only mandatory questions |
+| Finalization audit scans `shop-reference.md` before SME generation | pass | `onboarding-flow.md` requires a hard audit after ShopContext, before finalized state, before SME Generator, and before accepting an existing reference |
+| Finalization audit distinguishes blocking uncertainty from non-blocking gaps | pass | Normal route/machine/work-center/inspection/test/record mapping uncertainty blocks; missing manuals, future Level 4/5 evidence, optional enrichment, and clearly out-of-flow inactive assets do not |
 | Onboarding flow auto-runs SME Generator after finalized `shop-reference.md` | pass | `onboarding-flow.md` defines automatic SME generation only when `shop_reference_status: finalized` and registry/shells are missing |
 | Onboarding flow auto-runs SME Knowledge Builder after SME generation | pass | `onboarding-flow.md` defines automatic knowledge generation when registry/map are missing |
 | Planning can read later-layer instructions before execution | pass | `SKILL.md`, `onboarding-flow.md`, and `pipeline-state-contract.md` allow later-layer skill/reference reads for planning and validation |
@@ -103,7 +106,9 @@ New pass criteria:
 - State must not be pre-written to final ready state.
 - `shop-reference.md` existence must not be treated as ShopContext finalization.
 - `shop_reference_status: finalized` is required before SME Generator can execute.
+- `shop_reference_status: finalized` is necessary but not sufficient; the finalization audit must also pass.
 - `ShopContext Review - User Confirmation Needed`, `ShopContext Review - Still Blocked`, or `Blocking Open Questions` must block all downstream layers.
+- The finalization audit must scan `shop-reference.md` and the latest ShopContext output for unresolved normal-flow mapping uncertainty even when no explicit review-gate phrase was emitted.
 - `ready_for_questions` requires explicit artifact existence checks.
 - SME Knowledge Builder and public-source Layer 4 gathering must not begin before SME outputs exist.
 - Reading later-layer instructions for planning is allowed and is not treated as layer execution.
@@ -154,6 +159,70 @@ run shopfloor-ai
 
 Attach or paste an ambiguous router, machine list, and shop notes where at least one normal operation has conflicting machine/work-center ownership or a generic operation name that affects downstream mapping. The expected first-run result is the blocking status message and no downstream artifacts.
 
+## Required Regression Case: Exact cold-file ambiguity pattern blocks finalization audit
+
+### Test Setup
+
+Run `$shopfloor-ai` from a fresh cold clone with no generated root outputs and attach the ambiguous CCA router, machine list, and notes that contain this exact pattern:
+
+- `CCA-CTRL` Op `0030 Place Components` could map to `MY200 SX`, `MY300 DX`, or both.
+- `CCA-PWR` Op `0045 Inspect` in work center `635C01` could be Koh Young AOI or manual visual review.
+- `CCA-PWR` Op `0055 Process` in work center `632W01` could be `IBL VAC 545` vapor phase or `Heller 1809 MKIII`.
+- `CCA-PWR` Op `0075 Verify` in work center `635S01` could be manual final visual / microscope or another verification step.
+- `CCA-CTRL` Op `0080 Electrical Test` and `CCA-PWR` Op `0085 Functional Test` may or may not both map to `GenRad Test Rack 2`, and the retained result records may differ.
+
+### Why These Are Blocking
+
+- Each item affects a normal route operation, operation meaning, machine/equipment ownership, inspection/test identity, or retained-result claim.
+- `Inspect`, `Process`, and `Verify` are vague operation names whose downstream meaning is unresolved.
+- Multiple possible machines are listed without a source-supported selection rule.
+- Test equipment and result-retention mapping cannot be safely assumed for both routes.
+- Public README example notes that happen to mention these machines or work centers are documentation only and must not be treated as user confirmation.
+
+### Expected Behavior
+
+- ShopFloor AI runs ShopContext first.
+- ShopFloor AI runs the finalization audit before setting `shop_reference_status: finalized` or starting SME Generator.
+- If ShopContext already emits `ShopContext Review - User Confirmation Needed`, the wrapper preserves that gate.
+- If ShopContext creates `shop-reference.md` or omits an explicit review phrase, the finalization audit still detects the unresolved high-impact mappings and stops setup.
+- User-facing output says:
+
+  `ShopContext needs a few confirmations before setup can continue.`
+
+- The user is asked only the blocking mapping questions for Ops `0030`, `0045`, `0055`, `0075`, `0080`, and `0085`.
+- `.shop-ai/state.md` records:
+  - `onboarding_status: awaiting_shopcontext_confirmations`
+  - `shop_reference: draft`
+  - `shop_reference_status: review_needed`
+  - `sme_generation: not_started`
+  - `knowledge_builder: not_started`
+  - `question_mode: disabled`
+- `.shop-ai/onboarding-log.md` records the exact blocking questions.
+- No SME outputs are generated:
+  - no `sme-registry.md`
+  - no `sme-coverage.md`
+  - no `smes/`
+- No knowledge outputs are generated:
+  - no `knowledge-package-registry.md`
+  - no `sme-knowledge-map.md`
+  - no `knowledge-packages/`
+- The pipeline does not enter `ready_for_questions`.
+
+### Non-Blocking Control Cases
+
+The audit must not stop only because:
+
+- machine manuals, setup sheets, work instructions, specs, or future Level 4/Level 5 evidence are missing
+- an inactive or retired asset is unmapped and clearly outside current normal flow
+- an optional enrichment question does not affect standard route mapping
+- a possible record is mentioned without the reference claiming that it is retained
+
+The audit must still stop when public package docs or synthetic examples contain text that appears to answer the ambiguity, unless the user explicitly supplied those files as shop evidence.
+
+### Fresh Cold Test Requirement
+
+A fresh cold test is required because the regression concerns first-run behavior, dispatch, state creation, and the transition from ShopContext to SME Generator. A reused workspace cannot prove that the review gate is deterministic.
+
 ## Required Regression Case: Explicit shopfloor-ai invocation wins over ShopContext file matching
 
 ### Input
@@ -172,6 +241,6 @@ prompt: run shopfloor-ai
 
 ## Result
 
-Pass.
+Documentation and contract update pass. A fresh cold runtime test remains required for the exact ambiguity regression.
 
 The `$shopfloor-ai` skill now provides the intended MVP front door: onboarding messy inputs, showing short setup status lines, stopping for mandatory ShopContext questions, auto-running SME and knowledge generation when outputs are missing, updating state incrementally, and enabling normal shop questions through SME Manager behavior only after ready-state artifact checks pass.

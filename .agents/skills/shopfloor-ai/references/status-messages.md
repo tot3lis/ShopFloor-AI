@@ -50,7 +50,7 @@ When ready:
 
 ## Blocking ShopContext Questions
 
-If ShopContext finds mandatory blocking questions, outputs `ShopContext Review - User Confirmation Needed`, outputs `ShopContext Review - Still Blocked`, or includes a `Blocking Open Questions` section, stop and say:
+If ShopContext finds mandatory blocking questions, outputs `ShopContext Review - User Confirmation Needed`, outputs `ShopContext Review - Still Blocked`, includes a `Blocking Open Questions` section, or the finalization audit finds unresolved blocking uncertainty, stop and say:
 
 > ShopContext needs a few confirmations before setup can continue.
 
@@ -59,6 +59,8 @@ Then ask only the mandatory questions.
 Do not show a long mapping draft unless ShopContext explicitly requires it.
 
 Do not show SME Generator, SME Knowledge Builder, knowledge-package, or ready-state status messages while this review gate is active.
+
+The finalization audit may trigger this message even when `shop-reference.md` exists or `.shop-ai/state.md` previously said `shop_reference_status: finalized`.
 
 ## No Inputs Available
 
